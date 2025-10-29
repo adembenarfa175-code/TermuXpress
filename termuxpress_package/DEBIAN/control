@@ -6,5 +6,5 @@ Installed-Size: 526000
 Depends: code-server, nodejs-22, ripgrep, termux-api
 Section: util
 Priority: optional
-Homepage: https://github.com/YourRepo/TermuXpress
+Homepage: https://github.com/adembenarfa175-code/TermuXpress
 Description: A mobile developer environment for Termux featuring a TUI launcher for Code-Server and NeoVim.

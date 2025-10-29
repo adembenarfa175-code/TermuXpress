@@ -1,66 +1,34 @@
 #!/bin/bash
+# start-ide.sh: TermuXpress Launch Script
 
-# المسارات
-CONFIG_DIR="$PREFIX/share/termuxpress/config"
-SCRIPT_DIR="$PREFIX/share/termuxpress/scripts"
-NVIM_CONFIG="$HOME/.config/nvim"
+echo "🚀 Starting TermuXpress Mobile Development Environment..."
 
-# تأكد من أن termux-api مثبتة (لمعرفة IP)
-if ! command -v termux-api &> /dev/null; then
-    echo "Error: termux-api is required. Please run 'pkg install termux-api'."
+# 1. Check for Termux-API (required for clipboard/notifications)
+if ! command -v termux-notification &> /dev/null
+then
+    echo "Warning: termux-api not found. Some features may be disabled."
+fi
+
+# 2. Check for code-server and launch it
+if command -v code-server &> /dev/null
+then
+    echo "Launching Code-Server (accessible via browser at 127.0.0.1:8080)"
+    code-server --bind-addr 127.0.0.1:8080 &
+else
+    echo "Error: 'code-server' is not installed or not in PATH."
     exit 1
 fi
 
-# ==================================================
-# دالة تشغيل Code Server
-# ==================================================
-launch_code_server() {
-    # الحصول على IP المحلي للجهاز
-    LOCAL_IP=$(ifconfig | grep -A 1 'inet addr' | awk '{ print $2 }' | cut -d ':' -f 2 | head -1)
-
-    # التحقق من تشغيل Code Server
-    if pgrep -f "code-server" > /dev/null; then
-        echo "Code Server is already running. Access at: http://$LOCAL_IP:8080"
-        return
-    fi
-
-    echo "Starting Code Server on port 8080..."
-    # تشغيل code-server في الخلفية
-    code-server --bind-addr 0.0.0.0:8080 --auth none &
-
-    sleep 3
-    echo -e "\nCode Server is ready! Access it via browser at: http://$LOCAL_IP:8080"
-    echo "Press [Ctrl+C] to return to the launcher."
-    read -r # الانتظار لإشارة من المستخدم
-    pkill -f "code-server" # قتل العملية عند العودة
-}
-
-# ==================================================
-# دالة تشغيل NeoVim
-# ==================================================
-launch_nvim() {
-    echo "Launching NeoVim with custom configuration..."
+# 3. Launch NeoVim TUI interface
+if command -v nvim &> /dev/null
+then
+    echo "Launching NeoVim TUI. Press Ctrl+C to stop."
     nvim
-}
+else
+    echo "Warning: 'nvim' is not installed. Only Code-Server is running."
+fi
 
-# ==================================================
-# واجهة TUI البسيطة (القائمة)
-# ==================================================
-while true; do
-    clear
-    echo "========================================="
-    echo "   🚀 TermuXpress - Mobile Dev Launcher "
-    echo "========================================="
-    echo "1) 💻 Code-Server (VS Code in Browser)"
-    echo "2) 📝 NVIM (Custom Config)"
-    echo "3) 🚪 Exit to Termux Shell"
-    echo "========================================="
-    read -rp "Enter your choice: " choice
+# 4. Cleanup background processes (Code-Server)
+echo "TermuXpress exited. Stopping background processes..."
+pkill -f 'code-server'
 
-    case "$choice" in
-        1) launch_code_server ;;
-        2) launch_nvim ;;
-        3) exit 0 ;;
-        *) echo "Invalid choice. Press any key to continue..." && read -r ;;
-    esac
-done
