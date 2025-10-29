@@ -1,0 +1,10 @@
+Package: termuxpress
+Version: 1.0.0
+Architecture: all
+Maintainer: Adem Benarfa <adembenarfa175@gmail.com>
+Installed-Size: 526000
+Depends: code-server, nodejs-22, ripgrep, termux-api
+Section: util
+Priority: optional
+Homepage: https://github.com/YourRepo/TermuXpress
+Description: A mobile developer environment for Termux featuring a TUI launcher for Code-Server and NeoVim.

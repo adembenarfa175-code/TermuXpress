@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# فريق التطوير
+DEV_TEAM="TermuXpress Development Team: Adem Benarfa"
+
+echo "🚀 [TermuXpress] - Starting post-installation setup by $DEV_TEAM..."
+
+# 1. تحديث قائمة الحزم وتثبيت التبعيات (إذا لم تكن مثبته)
+apt update
+apt upgrade -y
+pkg install -y neovim curl git
+
+# 2. تثبيت Packer (مدير إضافات NeoVim)
+if [ ! -d "$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim" ]; then
+    git clone --depth 1 https://github.com/wbthomason/packer.nvim \
+    "$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim"
+fi
+
+# 3. نسخ ملفات التكوين إلى $HOME (إذا لم تكن موجودة)
+# هذه الملفات تسمح لـ TermuXpress بالعمل
+if [ ! -d "$HOME/.config/nvim" ]; then
+    mkdir -p "$HOME/.config"
+    cp -r $PREFIX/share/termuxpress/config/init.lua "$HOME/.config/nvim"
+fi
+
+# 4. نسخ السكريبت التنفيذي وإنشاء الرابط الرمزي (tmx)
+ln -sf $PREFIX/share/termuxpress/scripts/start-ide.sh $PREFIX/bin/tmx
+
+echo "🎉 [TermuXpress] Installation complete. Start with 'tmx'."
